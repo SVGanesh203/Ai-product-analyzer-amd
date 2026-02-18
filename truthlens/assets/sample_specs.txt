@@ -1,0 +1,9 @@
+Processor: AMD Ryzen 9 5900X
+RAM: 32GB DDR4
+Storage: 1TB NVMe SSD
+Graphics: NVIDIA GeForce RTX 3080
+Display: 15.6 inch 4K OLED
+Battery: 80Wh
+Weight: 2.1 kg
+OS: Windows 11 Pro
+Feature: Premium build, Backlit Keyboard

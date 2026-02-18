@@ -1,0 +1,15 @@
+streamlit
+transformers
+torch
+scikit-learn
+numpy
+pandas
+matplotlib
+seaborn
+wordcloud
+opencv-python
+requests
+beautifulsoup4
+vaderSentiment
+textblob
+onnxruntime
