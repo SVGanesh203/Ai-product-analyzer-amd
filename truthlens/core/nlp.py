@@ -27,7 +27,8 @@ def analyze_sentiment(reviews):
             "overall_score": 0.0,
             "sentiment_counts": {"POSITIVE": 0, "NEGATIVE": 0, "NEUTRAL": 0},
             "reviews_analyzed": 0,
-            "inference_time": 0.0
+            "inference_time": 0.0,
+            "device": "GPU" if device == 0 else "CPU"
         }
 
     start_time = time.time()

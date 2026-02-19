@@ -30,30 +30,79 @@ def scrape_amazon(url):
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
 
-        # Title
-        title_elem = soup.find("span", {"id": "productTitle"})
-        title = clean_text(title_elem.text) if title_elem else "Unknown Product"
+        # Title Selectors
+        title_selectors = [
+            {"id": "productTitle"},
+            {"id": "title"},
+            {"class": "a-size-large product-title-word-break"}
+        ]
+        title = "Unknown Product"
+        for selector in title_selectors:
+            elem = soup.find("span", selector)
+            if elem:
+                title = clean_text(elem.text)
+                break
 
-        # Price
-        price_elem = soup.find("span", {"class": "a-price-whole"})
-        price_fraction = soup.find("span", {"class": "a-price-fraction"})
+        # Price Selectors (Amazon India often uses different styles)
         price = "0.0"
-        if price_elem:
-            price = price_elem.text
-            if price_fraction:
-                price += "." + price_fraction.text
+        price_selectors = [
+            (".a-price-whole", ".a-price-fraction"),
+            (".apexPriceToPay .a-offscreen", None),
+            (".priceToPay .a-offscreen", None),
+            ("#priceblock_ourprice", None),
+            ("#priceblock_dealprice", None)
+        ]
+        
+        for whole_sel, frac_sel in price_selectors:
+            if whole_sel.startswith("#"):
+                price_elem = soup.find("span", id=whole_sel[1:])
+            else:
+                # Handle complex selectors manually for speed
+                if ".a-offscreen" in whole_sel:
+                    parent_class = whole_sel.split(" ")[0][1:]
+                    parent = soup.find("span", class_=parent_class)
+                    price_elem = parent.find("span", class_="a-offscreen") if parent else None
+                else:
+                    price_elem = soup.find("span", class_=whole_sel[1:])
+            
+            if price_elem:
+                price_text = price_elem.text.strip().replace(",", "")
+                # Remove currency symbol if it's there
+                price_text = price_text.replace("₹", "").replace("$", "").replace("Rs.", "").strip()
+                
+                if frac_sel:
+                    frac_elem = soup.find("span", class_=frac_sel[1:])
+                    if frac_elem:
+                        price_text += "." + frac_elem.text.strip()
+                
+                price = price_text
+                break
         
         # Ratings
-        rating_elem = soup.find("span", {"class": "a-icon-alt"})
+        rating_elem = soup.select_one(".a-icon-alt")
         rating = rating_elem.text.split(" ")[0] if rating_elem else "0.0"
 
-        # Reviews (Basic extraction from the main page)
+        # Reviews
         reviews = []
-        review_blocks = soup.find_all("div", {"data-hook": "review"})
-        for block in review_blocks:
-            review_text_elem = block.find("span", {"data-hook": "review-body"})
-            if review_text_elem:
-                reviews.append(clean_text(review_text_elem.text))
+        # Try different review containers
+        review_selectors = [
+            ("div", {"data-hook": "review"}),
+            ("div", {"id": "customer_review"}),
+            ("span", {"data-hook": "review-body"})
+        ]
+        
+        for tag, attr in review_selectors:
+            review_blocks = soup.find_all(tag, attr)
+            if review_blocks:
+                for block in review_blocks:
+                    # If it's the body directly
+                    if attr.get("data-hook") == "review-body":
+                        reviews.append(clean_text(block.text))
+                    else:
+                        review_text_elem = block.find("span", {"data-hook": "review-body"})
+                        if review_text_elem:
+                            reviews.append(clean_text(review_text_elem.text))
+                if reviews: break
 
         return {
             "title": title,
@@ -77,23 +126,23 @@ def scrape_flipkart(url):
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
 
-        # Title
-        title_elem = soup.find("span", {"class": "B_NuCI"})
+        # Title Selectors
+        title_elem = soup.find("span", {"class": "B_NuCI"}) or soup.find("span", {"class": "VU-Z7x"})
         title = clean_text(title_elem.text) if title_elem else "Unknown Product"
 
-        # Price
-        price_elem = soup.find("div", {"class": "_30jeq3 _16Jk6d"})
+        # Price Selectors
+        price_elem = soup.find("div", {"class": "_30jeq3 _16Jk6d"}) or soup.find("div", {"class": "Nx9bqj _4b5DiR"})
         price = price_elem.text if price_elem else "0.0"
 
         # Ratings
-        rating_elem = soup.find("div", {"class": "_3LWZlK"})
+        rating_elem = soup.find("div", {"class": "_3LWZlK"}) or soup.find("div", {"class": "XqYvS8"})
         rating = rating_elem.text if rating_elem else "0.0"
 
         # Reviews
         reviews = []
-        review_blocks = soup.find_all("div", {"class": "t-ZTKy"})
+        review_blocks = soup.find_all("div", {"class": "t-ZTKy"}) or soup.find_all("div", {"class": "Z_3_1W"})
         for block in review_blocks:
-             # Expand 'READ MORE' if present (Flipkart often hides full text)
+            # Strip 'READ MORE' if present
             review_text = block.text.replace("READ MORE", "").strip()
             reviews.append(clean_text(review_text))
 
