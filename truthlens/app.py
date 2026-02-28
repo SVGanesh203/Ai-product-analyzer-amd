@@ -51,9 +51,11 @@ specs_text = ""
 image_file = None
 
 if input_method == "Product Link":
-    product_url = st.sidebar.text_input("Enter Product URL (Amazon/Flipkart)")
-    if product_url:
-        if st.sidebar.button("Fetch Product Details"):
+    # Use a key to allow programmatic clearing
+    product_url = st.sidebar.text_input("Enter Product URL (Amazon/Flipkart)", key="product_url_input")
+    
+    if st.sidebar.button("Fetch Product Details"):
+        if product_url:
             with st.spinner("Scraping product data..."):
                 data = scraping.scrape_product(product_url)
                 if data and "error" not in data:
@@ -64,6 +66,14 @@ if input_method == "Product Link":
                     st.session_state['scraped_data'] = data # Cache
                 else:
                     st.error("Failed to scrape product. Please try manual entry.")
+        else:
+            st.sidebar.warning("Please enter a URL first.")
+
+    if st.sidebar.button("Clear URL"):
+        st.session_state["product_url_input"] = ""
+        if 'scraped_data' in st.session_state:
+            del st.session_state['scraped_data']
+        st.rerun()
 
     # Load from cache if available
     if 'scraped_data' in st.session_state:
