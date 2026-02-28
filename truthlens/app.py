@@ -14,32 +14,97 @@ st.set_page_config(
 # Custom CSS for "Premium" look
 st.markdown("""
 <style>
-    .main {
-        background-color: #f5f5f5;
+    /* Global Settings & Typography */
+     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
     }
+    
+    /* Headers */
+    h1, h2, h3 {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    /* Primary Button Styling */
     .stButton>button {
         width: 100%;
-        background-color: #FF4B4B;
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
         color: white;
-        font-weight: bold;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2), 0 2px 4px -1px rgba(239, 68, 68, 0.1);
     }
-    .metric-card {
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -2px rgba(239, 68, 68, 0.15);
+        color: white;
+        border: none;
+    }
+    
+    /* Metric Cards Customization */
+    [data-testid="stMetricValue"] {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+    [data-testid="stMetricLabel"] {
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+    div[data-testid="metric-container"] {
         background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        text-align: center;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border: 1px solid #e2e8f0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    h1 {
-        color: #1D2951;
+    div[data-testid="metric-container"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        border-right: 1px solid #e2e8f0;
+    }
+    [data-testid="stSidebar"] h1 {
+        color: #EF4444;
+        font-weight: 800;
+        font-size: 2rem;
+    }
+    
+    /* Inputs */
+    .stTextInput>div>div>input {
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+    }
+    .stTextArea>div>div>textarea {
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+    }
+    
+    /* Warning/Info/Success Boxes */
+    .stAlert {
+        border-radius: 8px;
+        border: none;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.title("🔍 TruthLens")
-st.sidebar.markdown("AI-Powered Product Analysis")
-st.sidebar.markdown("---")
+st.sidebar.markdown("<h1 style='text-align: center; color: #EF4444; margin-bottom: 0;'>🔍 TruthLens</h1>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='text-align: center; color: #64748b; font-weight: 600; margin-top: -10px;'>AI-Powered Product Analysis</p>", unsafe_allow_html=True)
+st.sidebar.markdown("<hr style='border: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 # Inputs
 input_method = st.sidebar.radio("Input Method", ["Product Link", "Manual Entry"])
