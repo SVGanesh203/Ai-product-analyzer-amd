@@ -21,11 +21,6 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     
-    .main {
-        background-color: #f8f9fa;
-        color: #1a1a2e;
-    }
-    
     /* Headers */
     h1, h2, h3 {
         color: #0f172a;
@@ -80,7 +75,6 @@ st.markdown("""
     
     /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: #ffffff;
         border-right: 1px solid #e2e8f0;
     }
     [data-testid="stSidebar"] h1 {
