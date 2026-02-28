@@ -50,30 +50,31 @@ reviews_text = ""
 specs_text = ""
 image_file = None
 
+def clear_search():
+    st.session_state["product_url_input"] = ""
+    if 'scraped_data' in st.session_state:
+        del st.session_state['scraped_data']
+
 if input_method == "Product Link":
     # Use a key to allow programmatic clearing
     product_url = st.sidebar.text_input("Enter Product URL (Amazon/Flipkart)", key="product_url_input")
     
-    if st.sidebar.button("Fetch Product Details"):
-        if product_url:
-            with st.spinner("Scraping product data..."):
-                data = scraping.scrape_product(product_url)
-                if data and "error" not in data:
-                    st.success("Product Found!")
-                    product_name = data.get("title")
-                    product_price = data.get("price")
-                    reviews_text = "\n".join(data.get("reviews", []))
-                    st.session_state['scraped_data'] = data # Cache
-                else:
-                    st.error("Failed to scrape product. Please try manual entry.")
-        else:
-            st.sidebar.warning("Please enter a URL first.")
-
-    if st.sidebar.button("Clear URL"):
-        st.session_state["product_url_input"] = ""
-        if 'scraped_data' in st.session_state:
-            del st.session_state['scraped_data']
-        st.rerun()
+    col1, col2 = st.sidebar.columns(2)
+    with col1:
+        if st.button("Fetch Details", use_container_width=True):
+            if product_url:
+                with st.spinner("Scraping..."):
+                    data = scraping.scrape_product(product_url)
+                    if data and "error" not in data:
+                        st.session_state['scraped_data'] = data
+                        st.rerun()
+                    else:
+                        st.error("Failed to scrape.")
+            else:
+                st.sidebar.warning("Enter URL.")
+    
+    with col2:
+        st.button("Clear URL", on_click=clear_search, use_container_width=True)
 
     # Load from cache if available
     if 'scraped_data' in st.session_state:
